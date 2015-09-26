@@ -6,31 +6,42 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import java.io.IOException;
+import android.widget.TextView;
 
 /**
  * Created by Josh on 9/24/2015.
  */
+
+//FLICKR KEY
+    //b5a4d6877915b52957ea8d40ce58eb92
+    //https://api.flickr.com/services/rest/?method=flickr.photos.getRecent&api_key=xxx&format=json&nojsoncallback=1
 public class PhotoGalleryFragment extends Fragment {
 
     private static final String TAG = "PhotoGalleryFragment";
 
     private RecyclerView mPhotoRecyclerView;
 
+
+    private class PhotoHolder extends RecyclerView.ViewHolder {
+        private TextView mTitleTextView;
+
+        public PhotoHolder(View itemView){
+            super(itemView);
+            mTitleTextView = (TextView) itemView;
+        }
+        public void bindGalleryItem(GalleryItem item){
+            mTitleTextView.setText(item.toString());
+        }
+    }
+
+
     private class FetchItemsTask extends AsyncTask<Void, Void, Void>{
         @Override
         protected Void doInBackground(Void... params) {
-            try {
-                String result = new FlickrFetchr().getUrlString("https://www.bignerdranch.com");
-                Log.i(TAG, "Fetched contents of URL: " + result);
-            }catch (IOException ioe){
-                Log.e(TAG, "Failed to fetch URL: ", ioe);
-            }
+           new FlickrFetchr().fetchItems();
             return null;
         }
     }
@@ -43,6 +54,7 @@ public class PhotoGalleryFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
+        new FetchItemsTask().execute();
     }
 
     @Nullable
